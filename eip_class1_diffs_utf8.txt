@@ -1,0 +1,261 @@
+﻿Time: 2026-05-24T06:56:09Z
+Created At: 2026-05-24T06:56:09Z
+Completed At: 2026-05-24T06:56:25Z
+The following changes were made by the replace_file_content tool to: d:\soft_kaifa\闆嗘垚骞冲彴\1\electron\eip-class1.js. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -720,41 +720,57 @@
+                                                 const pathHex = Array.from(pathBuffer).map(b => b.toString(16).toUpperCase().padStart(2, '0')).join(' ');
+                                                 console.log(`[EIP Class 1 Slave] Incoming Connection Path Hex: ${pathHex}`);
+  
+-                                                // Extract instance IDs from pathBuffer if standard format
+-                                                let reqO2TInstance = null;
+-                                                let reqT2OInstance = null;
+-                                                if (pathBuffer.length >= 6 && pathBuffer[0] === 0x20 && pathBuffer[1] === 0x04) {
+-                                                    let pOffset = 2;
+-                                                    // O->T Assembly Segment (0x24 = 8-bit Instance, 0x25 = 16-bit Instance)
+-                                                    if (pathBuffer[pOffset] === 0x24) {
+-                                                        reqO2TInstance = pathBuffer[pOffset + 1];
+-                                                        pOffset += 2;
+-                                                    } else if (pathBuffer[pOffset] === 0x25) {
+-                                                        reqO2TInstance = pathBuffer.readUInt16LE(pOffset + 1);
+-                                                        pOffset += 3;
+-                                                    }
+-                                                    // T->O Assembly Segment (0x2C = 8-bit Instance, 0x2D = 16-bit Instance)
+-                                                    if (pathBuffer[pOffset] === 0x2C) {
+-                             
+<truncated 4563 bytes>
+nfig.adapterConfig.connections.find(c => 
++                                                         c.connectionType === 'TAG' && c.connectionPath && c.connectionPath.trim() === reqTag
++                                                     );
++                                                 }
++  
++                                                 // 2. Precise Match by Assembly Instance IDs
++                                                 if (!targetConn && reqO2TInstance !== null && reqT2OInstance !== null) {
++                                                     targetConn = this.config.adapterConfig.connections.find(c => 
++                                                         c.o2tInstance === reqO2TInstance && c.t2oInstance === reqT2OInstance
++                                                     );
++                                                 }
++  
++                                                 // 3. Precise Match by connectionPath Hex string
++                                                 if (!targetConn) {
++                                                     targetConn = this.config.adapterConfig.connections.find(c => 
++                                                         c.connectionPath && c.connectionPath.replace(/\s+/g, '').toUpperCase() === pathHex.replace(/\s+/g, '').toUpperCase()
++                                                     );
++                                                 }
+                                             } catch (pathErr) {
+                                                 console.error("[EIP Class 1 Slave] Error parsing incoming connection path:", pathErr);
+                                             }
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+We did our best to apply changes despite some inaccuracies. Double check if the edit applied is what you intended.
+-----------------
+Time: 2026-05-24T06:58:31Z
+Created At: 2026-05-24T06:58:31Z
+Completed At: 2026-05-24T06:58:31Z
+The following changes were made by the replace_file_content tool to: C:\Users\84322\.gemini\antigravity\brain\1b83c754-69c2-417c-a241-8fc5d77cf87e\task.md. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -33,6 +33,7 @@
+   - `[x]` 淇 T->O Connection ID 鍔ㄦ€佸垎閰嶏細褰撲富绔欏彂鏉ョ殑 Forward Open 鎼哄甫 `0` 浣滀负 T->O Network Connection ID 鏃讹紝浠庣珯绔嚜鍔ㄤ负鍏堕殢鏈哄垎鍙戜笉涓?0 鐨勫敮涓€杩炴帴 ID 骞跺湪 Response 涓繑鍥烇紝纭繚 Worker 鍛ㄦ湡骞挎挱涓嶈璺宠繃
+   - `[x]` 淇鍗曞悜 TAG 鎺ユ敹瓒呮椂锛氬湪 Worker (`eip-class1-worker.js`) 鍛ㄦ湡寰幆涓紝瀵?`TAG` 绫诲瀷杩炴帴鑷姩璞佸厤/缁曡繃 inputs (O->T) 鍗曞悜鎺ユ敹瓒呮椂闄愬埗锛岄槻姝㈣繛鎺ョ灛闂磋缃负 `isDropped` 鎸傝捣
+   - `[x]` 淇 TAG 鍙戦€佹暟鎹抚闀垮害涓嶄竴鑷撮棶棰橈細鍦?Forward Open 璇锋眰瑙ｆ瀽涓紝瀹屽叏绉婚櫎 `TAG` 绫诲瀷杩炴帴鐨?size 瑕嗗啓琛屼负锛屼繚鐣欑敤鎴峰湪 UI 涓婇厤缃殑绮剧‘瀛楄妭灏哄锛堝 `4` 瀛楄妭锛夛紱骞跺湪 `updateIds` 淇′护涓姞鍏?`o2tSize` 涓?`t2oSize` 浼犻€掞紝寮哄埗 Worker 浠ラ厤缃殑澶у皬涓哄噯杩涜 implicit 鍙戦€?+  - `[x]` 淇鏍囩杩炴帴鍖归厤閫€鍖栵細涓昏繘绋嬶紙`eip-class1.js`锛夐泦鎴?ANSI 鎵╁睍绗﹀彿娈碉紙`0x91` 娈靛悕锛夊瓧鑺傛祦瑙ｆ瀽鍣紝鍦ㄦ帴鏀跺埌 Forward Open 鏃剁簿鍑嗗弽搴忓垪鍖栧苟鎻愬彇鍑烘爣绛惧瓧绗︿覆锛堝 `"tag1"`锛夛紝浼樺厛鍖归厤鍒楄〃涓殑瀵瑰簲鏍囩杩炴帴锛屽交搴曟秷闄や簡褰撲富浠庨厤缃笉涓€鑷存椂鍥犲尮閰嶉€€鍖?閫€缂╁埌 Connection 0锛堟爣鍑?I/O锛屽ぇ灏忎负 6 瀛楄妭锛夎€屽鑷村彂鍑?6 瀛楄妭鏁版嵁甯х殑搴曞眰缂洪櫡
+   - `[x]` 缂栬瘧鏋勫缓鏈€鏂板畨瑁呭寘浜や粯锛坄dist_electron\Industrial Client Suite Setup 2.6.6.exe`锛? 
+ 
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+-----------------
+Time: 2026-05-24T06:58:36Z
+Created At: 2026-05-24T06:58:36Z
+Completed At: 2026-05-24T06:58:37Z
+The following changes were made by the replace_file_content tool to: C:\Users\84322\.gemini\antigravity\brain\1b83c754-69c2-417c-a241-8fc5d77cf87e\walkthrough.md. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -112,11 +112,15 @@
+   * 鏍囩閫氳鏄崟鍚戠殑锛屼粠绔欎綔涓虹敓浜ц€咃紙O->T锛夊懆鏈熷彂鏁版嵁锛屼富绔欙紙Scanner锛変綔涓虹函娑堣垂鑰呬笉浼氬畾鏈熷悜浠庣珯鍥炲彂闅愬紡 UDP 鏁版嵁鍖呫€?   * 涔嬪墠浠庣珯妫€娴嬪埌娌℃湁 incoming 闅愬紡 UDP 鏃讹紝浼氬湪 2 绉掑唴瑙﹀彂 Rx 鎺ユ敹瓒呮椂锛屼粠鑰屽皢 `c.isDropped` 缃负 `true` 骞舵寕璧峰彂閫併€?   * 鎴戜滑鍦?Worker 杞涓繘琛屼簡绮惧噯杩囨护锛氬 `connectionType === 'TAG'` 鐨勮繛鎺ュ畬鍏ㄧ粫杩?璞佸厤鎺ユ敹瓒呮椂鍒ゅ畾锛岀‘淇濅竴鏃︿富绔?TCP 鎻℃墜涓?Forward Open 鎴愬姛锛孶DP 鍛ㄦ湡骞挎挱寮曟搸鍗虫寔缁珮棰戠偣浜紝缁濅笉鏂仈銆?-* **淇濈暀 UI 鐪熷疄澶у皬锛岄槻姝㈣涓荤珯铏氭嫙澶х紦鍐插尯瑕嗙洊 [NEW FIXED]**锛?+* **淇濈暀 UI 鐪熷疄澶у皬锛岄槻姝㈣涓荤珯铏氭嫙澶х紦鍐插尯瑕嗙洊**锛?   * 涓荤珯锛圥LC / Scanner锛夊湪鍙戣捣 `Forward Open ('tag1')` 鏃讹紝鍏舵惡甯︾殑 connection size 灞炴€у彲鑳戒娇鐢ㄤ簡鍐呴儴榛樿鍒嗛厤鐨勮秴闀胯櫄鎷熷ぇ缂撳啿鍖猴紙渚嬪 `100` 瀛楄妭锛夈€?-  * 姝ゅ墠閫昏緫涓紝鎴戜滑浠庣珯琚姩鍦板皢 UI 閰嶇疆鐨勫ぇ灏忚鍐欎负 `100` 瀛楄妭锛屽鑷翠粠绔欓珮棰戝彂鍑轰簡 100 瀛楄妭鐨?UDP Payload锛堝浣欏瓧鑺傚叏濉厖闆讹級銆?+  * 姝ゅ墠閫昏緫涓紝鎴戜滑浠庣珯琚姩鍦板皢 UI 閰嶇疆鐨勫ぇ灏忚鍐欎负 `100` 瀛楄妭锛屽鑷翠粠绔欓珮棰戝彂鍑轰簡 100 瀛楄妭 of UDP Payload锛堝浣欏瓧鑺傚叏濉厖闆讹級銆?   * 鐜板凡褰诲簳鏉滅粷杩欎竴鐜拌薄锛氫富绾跨▼ Forward Open 妯″潡涓笉鍐嶅 `TAG` 绫诲瀷杩炴帴瑕嗗啓 `o2tSize` 涓?`t2oSize`锛?*寮哄埗灏婇噸骞朵繚鐣?UI 涓婄殑鑷畾涔夊ぇ灏忥紙濡?`4` 瀛楄妭锛?*銆?   * 鍚屾椂鍦ㄥ悜 Worker 鍚屾 `updateIds` 淇℃伅鏃讹紝杩藉姞浜?`o2tSize` 涓?`t2oSize` 鍙傛暟锛岀‘淇?Worker 搴曞眰鐨勫彂閫佺紦鍐插尯闀垮害涓庢偍鍦ㄨ〃鏍间腑鐨勫ぇ灏忚缃畬鍏ㄥ惢鍚堛€?+* **鏀诲厠鏍囩璺緞绮剧‘鍖归厤锛屾牴闄ゅぇ灏忛€€鍖栬嚦 Standard I/O (6 瀛楄妭) [NEW FIXED]**锛?+  * **鍖归厤婕忔礊**锛氫富绔欏彂鍑虹殑 `Forward Open` 璇锋眰涓紝瀵逛簬鏍囩杩炴帴鐨勭墿鐞?Path 浼氫互 ANSI 鎵╁睍绗﹀彿娈碉紙`0x91` 鏍囪瘑锛屾惡甯?`"tag1"`锛変紶杈撱€傝€屾垜浠殑鏈湴杩炴帴閰嶇疆鏄互瀛楅潰瀛楃涓插瓨鍌ㄧ殑锛岀敱浜庡師鍏堢殑 hex 绠€鍗曞尮閰嶆棤娉曞搴旓紝涓荤珯璇锋眰鏈€缁?*鍥犳棤娉曞尮閰嶈€岃嚜鍔ㄩ€€缂?鍥為€€鍖归厤鍒颁簡閰嶇疆涓殑绗竴涓繛鎺ワ紙Connection 1锛屽ぇ灏忎负 6 瀛楄妭鐨勬爣鍑?I/O 杩炴帴锛?*銆備粠鑰屽€熺敤鍏?6 瀛楄妭澶у皬鍚戜富绔欏彂鍖呫€?+  * **瑙ｅ喅鏂规**锛氬湪涓荤嚎绋嬶紙`eip-class1.js`锛夌殑 Forward Open 杩炴帴澶勭悊涓紝鎴戜滑**闆嗘垚浜?ANSI Extended Symbol Segment (0x91) 绗﹀彿娈电殑绮惧噯瑙ｇ爜鍣?*锛屽湪瑙ｆ瀽杩炴帴 Path 鏃剁洿鎺ュ弽搴忓垪鍖栨彁鍙栧嚭 ASCII 鏍囩鍚嶏紙渚嬪 `"tag1"`锛夈€?+  * 鍖归厤鏍戠涓€浼樺厛绾ц皟鏁翠负浠ヨ Tag 鏍囩鍚嶈繘琛屾绱€傝繖瀹岀編淇濊瘉浜嗕富绔?`'tag1'` 璇锋眰浼?100% 绮剧‘鍖归厤鍒版垜浠?UI 涓婄殑 `'tag1'` 鏍囩杩炴帴锛屼娇鍏朵繚鐣?UI 閰嶇疆鐨?**4 瀛楄妭** 鍙戦€佸昂瀵革紝鎴愬姛瑙ｅ喅浜嗗彂閫佸嚭 6 瀛楄妭鏁版嵁甯х殑涓ラ噸闂锛? 
+ ---
+ 
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+-----------------
+Time: 2026-05-24T07:08:53Z
+Created At: 2026-05-24T07:08:53Z
+Completed At: 2026-05-24T07:08:53Z
+The following changes were made by the replace_file_content tool to: d:\soft_kaifa\闆嗘垚骞冲彴\1\electron\eip-class1.js. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -794,7 +794,11 @@
+                                             const rawO2TSize = isLarge ? (o2tParams & 0xFFFF) : (o2tParams & 0x01FF);
+                                             const rawT2OSize = isLarge ? (t2oParams & 0xFFFF) : (t2oParams & 0x01FF);
+                                             
+-                                            if (targetConn.connectionType === 'TAG') {
++                                            const isTagConnection = targetConn.connectionType === 'TAG' || 
++                                                (targetConn.connectionPath && !/^([0-9A-Fa-f]{2}\s*)+$/.test(targetConn.connectionPath.trim())) || 
++                                                !!reqTag;
++                                            
++                                            if (isTagConnection) {
+                                                 // Preserve UI configured sizes (e.g. 4 bytes) instead of overwriting with Scanner's request size
+                                             } else {
+                                                 // Robust O->T sizing: detect standard size + 4 (Run/Idle), legacy size + 6, or fall back to standard -4.
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+-----------------
+Time: 2026-05-24T07:10:47Z
+Created At: 2026-05-24T07:10:47Z
+Completed At: 2026-05-24T07:10:48Z
+The following changes were made by the replace_file_content tool to: C:\Users\84322\.gemini\antigravity\brain\1b83c754-69c2-417c-a241-8fc5d77cf87e\task.md. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -34,6 +34,7 @@
+   - `[x]` 淇鍗曞悜 TAG 鎺ユ敹瓒呮椂锛氬湪 Worker (`eip-class1-worker.js`) 鍛ㄦ湡寰幆涓紝瀵?`TAG` 绫诲瀷杩炴帴鑷姩璞佸厤/缁曡繃 inputs (O->T) 鍗曞悜鎺ユ敹瓒呮椂闄愬埗锛岄槻姝㈣繛鎺ョ灛闂磋缃负 `isDropped` 鎸傝捣
+   - `[x]` 淇 TAG 鍙戦€佹暟鎹抚闀垮害涓嶄竴鑷撮棶棰橈細鍦?Forward Open 璇锋眰瑙ｆ瀽涓紝瀹屽叏绉婚櫎 `TAG` 绫诲瀷杩炴帴鐨?size 瑕嗗啓琛屼负锛屼繚鐣欑敤鎴峰湪 UI 涓婇厤缃殑绮剧‘瀛楄妭灏哄锛堝 `4` 瀛楄妭锛夛紱骞跺湪 `updateIds` 淇′护涓姞鍏?`o2tSize` 涓?`t2oSize` 浼犻€掞紝寮哄埗 Worker 浠ラ厤缃殑澶у皬涓哄噯杩涜 implicit 鍙戦€?   - `[x]` 淇鏍囩杩炴帴鍖归厤閫€鍖栵細涓昏繘绋嬶紙`eip-class1.js`锛夐泦鎴?ANSI 鎵╁睍绗﹀彿娈碉紙`0x91` 娈靛悕锛夊瓧鑺傛祦瑙ｆ瀽鍣紝鍦ㄦ帴鏀跺埌 Forward Open 鏃剁簿鍑嗗弽搴忓垪鍖栧苟鎻愬彇鍑烘爣绛惧瓧绗︿覆锛堝 `"tag1"`锛夛紝浼樺厛鍖归厤鍒楄〃涓殑瀵瑰簲鏍囩杩炴帴锛屽交搴曟秷闄や簡褰撲富浠庨厤缃笉涓€鑷存椂鍥犲尮閰嶉€€鍖?閫€缂╁埌 Connection 0锛堟爣鍑?I/O锛屽ぇ灏忎负 6 瀛楄妭锛夎€屽鑷村彂鍑?6 瀛楄妭鏁版嵁甯х殑搴曞眰缂洪櫡
++  - `[x]` 瑙ｅ喅 Legacy 閰嶇疆鏂囦欢鍖归厤澶у皬閫€鍖栵細涓荤嚎绋?(`eip-class1.js`) 涓?Worker (`eip-class1-worker.js`) 鍙岄噸闆嗘垚鑷€傚簲绗﹀彿璺緞璇嗗埆鍒ゅ畾锛屽綋杩炴帴鍦ㄦ棫鐗堥」鐩腑缂哄皯 `connectionType === 'TAG'` 鏄惧紡灞炴€ф椂锛岃嚜鍔ㄨ瘑鍒潪 Hex 鐗╃悊璺緞鐨勫瓧绗︿覆涓?`TAG` 绗﹀彿鍨嬭繛鎺ワ紝骞跺己鍒堕攣瀹?UI 閰嶇疆澶у皬杩涜鎴柇鍙戦€侊紝褰诲簳娑堥櫎浜嗗彂鍑?6 瀛楄妭鐨勭墿鐞嗘畫鐣欑己闄?   - `[x]` 缂栬瘧鏋勫缓鏈€鏂板畨瑁呭寘浜や粯锛坄dist_electron\Industrial Client Suite Setup 2.6.6.exe`锛? 
+ 
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+-----------------
+Time: 2026-05-24T07:10:53Z
+Created At: 2026-05-24T07:10:53Z
+Completed At: 2026-05-24T07:11:03Z
+The following changes were made by the replace_file_content tool to: C:\Users\84322\.gemini\antigravity\brain\1b83c754-69c2-417c-a241-8fc5d77cf87e\walkthrough.md. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -121,6 +121,10 @@
+   * **鍖归厤婕忔礊**锛氫富绔欏彂鍑虹殑 `Forward Open` 璇锋眰涓紝瀵逛簬鏍囩杩炴帴鐨勭墿鐞?Path 浼氫互 ANSI 鎵╁睍绗﹀彿娈碉紙`0x91` 鏍囪瘑锛屾惡甯?`"tag1"`锛変紶杈撱€傝€屾垜浠殑鏈湴杩炴帴閰嶇疆鏄互瀛楅潰瀛楃涓插瓨鍌ㄧ殑锛岀敱浜庡師鍏堢殑 hex 绠€鍗曞尮閰嶆棤娉曞搴旓紝涓荤珯璇锋眰鏈€缁?*鍥犳棤娉曞尮閰嶈€岃嚜鍔ㄩ€€缂?鍥為€€鍖归厤鍒颁簡閰嶇疆涓殑绗竴涓繛鎺ワ紙Connection 1锛屽ぇ灏忎负 6 瀛楄妭鐨勬爣鍑?I/O 杩炴帴锛?*銆備粠鑰屽€熺敤鍏?6 瀛楄妭澶у皬鍚戜富绔欏彂鍖呫€?   * **瑙ｅ喅鏂规**锛氬湪涓荤嚎绋嬶紙`eip-class1.js`锛夌殑 Forward Open 杩炴帴澶勭悊涓紝鎴戜滑**闆嗘垚浜?ANSI Extended Symbol Segment (0x91) 绗﹀彿娈电殑绮惧噯瑙ｇ爜鍣?*锛屽湪瑙ｆ瀽杩炴帴 Path 鏃剁洿鎺ュ弽搴忓垪鍖栨彁鍙栧嚭 ASCII 鏍囩鍚嶏紙渚嬪 `"tag1"`锛夈€?   * 鍖归厤鏍戠涓€浼樺厛绾ц皟鏁翠负浠ヨ Tag 鏍囩鍚嶈繘琛屾绱€傝繖瀹岀編淇濊瘉浜嗕富绔?`'tag1'` 璇锋眰浼?100% 绮剧‘鍖归厤鍒版垜浠?UI 涓婄殑 `'tag1'` 鏍囩杩炴帴锛屼娇鍏朵繚鐣?UI 閰嶇疆鐨?**4 瀛楄妭** 鍙戦€佸昂瀵革紝鎴愬姛瑙ｅ喅浜嗗彂閫佸嚭 6 瀛楄妭鏁版嵁甯х殑涓ラ噸闂锛?+* **瑙ｅ喅 Legacy 閰嶇疆鏂囦欢鍖归厤澶у皬閫€鍖?(鍏ㄩ潰鍏煎鏃х増鏈厤缃? [NEW FIXED]**锛?+  * **闅愯棌缂洪櫡**锛氬鏋滃綋鍓嶉厤缃槸浠庢棫鐗堥」鐩枃浠跺鍏ョ殑锛屾垨鑰呮槸鐢辨爣鍑?I/O 淇敼璺緞寰楀埌鐨勶紝鍒欒杩炴帴搴曞眰鐨?`connectionType` 瀛楁鍙兘缂哄け鎴栦负 `undefined`銆傝繖绉嶆儏鍐典笅绯荤粺浼氬悗澶囬€€鍖栦负甯歌 `'IO'` 鍒ゅ畾锛岃繘鑰岃瑙﹀彂 Robust 瀛楄妭澶у皬瑕嗗啓閫昏緫锛屽皢鍙戦€佸昂瀵稿己鍒惰瀹氫负浜?6 瀛楄妭銆?+  * **楂樺彲闈犱慨姝?*锛氭垜浠湪涓荤嚎绋嬶紙`eip-class1.js`锛変笌 Worker 绾跨▼涓弻鍚戝疄鏂戒簡**鑷€傚簲绗﹀彿璺緞璇嗗埆鍒ゅ畾**銆傚鏋滄娴嬪埌杩炴帴璺緞 `connectionPath` 涓洪潪鍗佸叚杩涘埗鐨勫瓧绗︿覆璺緞鏍煎紡锛屽嵆渚垮簳灞傛病鏈夋樉寮忕殑 `'TAG'` 绫诲瀷鏍囪锛屾垨鑰呬富绔?`Forward Open` 鐨勮В鏋愭殏鏃跺尮閰嶄笉鍒扮被鍨嬶紝搴曞眰涔熷皢鏃犳潯浠跺湴寮哄埗璁ゅ畾褰撳墠涓?`TAG` 绗﹀彿杩炴帴锛?+  * 杩欎笉浠呯‘淇濅簡 UI 涓婄殑閰嶇疆澶у皬锛? 瀛楄妭锛夎寮哄埗灏婇噸涓庝繚鐣欙紝涔熷己鍒?Worker 瀵瑰彂閫佺紦鍐插尯杩涜 `Math.min` 鐨勭簿纭?4 瀛楄妭鏁版嵁鎴柇鍙戦€侊紝褰诲簳鏂╂柇浜嗗浣?2 瀛楄妭锛堝叡 6 瀛楄妭锛夌殑鐗╃悊娈嬬暀 Bug锛? 
+ ---
+ 
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+We did our best to apply changes despite some inaccuracies. Double check if the edit applied is what you intended.
+-----------------
+Time: 2026-05-24T07:12:56Z
+Created At: 2026-05-24T07:12:56Z
+Completed At: 2026-05-24T07:13:13Z
+The following changes were made by the multi_replace_file_content tool to: d:\soft_kaifa\闆嗘垚骞冲彴\1\electron\eip-class1.js. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -754,7 +754,7 @@
+                                                  // 1. Precise Match by Tag Name
+                                                  if (reqTag) {
+                                                      targetConn = this.config.adapterConfig.connections.find(c => 
+-                                                         c.connectionType === 'TAG' && c.connectionPath && c.connectionPath.trim() === reqTag
++                                                         c.connectionPath && c.connectionPath.trim().toLowerCase() === reqTag.toLowerCase()
+                                                      );
+                                                  }
+   
+@@ -798,6 +798,7 @@
+                                                 !!reqTag;
+                                             
+                                             if (isTagConnection) {
++                                                targetConn.connectionType = 'TAG'; // Force TAG connection type in runtime
+                                                 // Preserve UI configured sizes (e.g. 4 bytes) instead of overwriting with Scanner's request size
+                                             } else {
+                                                 // Robust O->T sizing: detect standard size + 4 (Run/Idle), legacy size + 6, or fall back to standard -4.
+@@ -840,7 +840,8 @@
+                                                     t2oDataset: targetConn.t2oDataset,
+                                                     loopbackMappings: targetConn.loopbackMappings,
+                                                     bulkLoopback: targetConn.bulkLoopback,
+-                                                    connectionType: targetConn.connectionType
++                                                    connectionType: targetConn.connectionType,
++                                                    connectionPath: targetConn.connectionPath
+                                                 });
+                                             }
+                                         }
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+We did our best to apply changes despite some inaccuracies. Double check if the edit applied is what you intended.
+-----------------
+Time: 2026-05-24T07:19:07Z
+Created At: 2026-05-24T07:19:07Z
+Completed At: 2026-05-24T07:19:23Z
+The following changes were made by the multi_replace_file_content tool to: d:\soft_kaifa\闆嗘垚骞冲彴\1\electron\eip-class1.js. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -754,7 +754,7 @@
+                                                  // 1. Precise Match by Tag Name
+                                                  if (reqTag) {
+                                                      targetConn = this.config.adapterConfig.connections.find(c => 
+-                                                         c.connectionPath && c.connectionPath.trim().toLowerCase() === reqTag.toLowerCase()
++                                                         c && typeof c.connectionPath === 'string' && c.connectionPath.trim().toLowerCase() === reqTag.toLowerCase()
+                                                      );
+                                                  }
+   
+@@ -767,7 +767,7 @@
+                                                  // 3. Precise Match by connectionPath Hex string
+                                                  if (!targetConn) {
+                                                      targetConn = this.config.adapterConfig.connections.find(c => 
+-                                                         c.connectionPath && c.connectionPath.replace(/\s+/g, '').toUpperCase() === pathHex.replace(/\s+/g, '').toUpperCase()
++                                                         c && typeof c.connectionPath === 'string' && c.connectionPath.replace(/\s+/g, '').toUpperCase() === pathHex.replace(/\s+/g, '').toUpperCase()
+                                                      );
+                                                  }
+                                             } catch (pathErr) {
+@@ -793,7 +793,7 @@
+                                             const rawT2OSize = isLarge ? (t2oParams & 0xFFFF) : (t2oParams & 0x01FF);
+                                             
+                                             const isTagConnection = targetConn.connectionType === 'TAG' || 
+-                                                (targetConn.connectionPath && !/^([0-9A-Fa-f]{2}\s*)+$/.test(targetConn.connectionPath.trim())) || 
++                                                (targetConn.connectionPath && typeof targetConn.connectionPath === 'string' && !/^([0-9A-Fa-f]{2}\s*)+$/.test(targetConn.connectionPath.trim())) || 
+                                                 !!reqTag;
+                                             
+                                             if (isTagConnection) {
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+We did our best to apply changes despite some inaccuracies. Double check if the edit applied is what you intended.
+-----------------
+Time: 2026-05-24T07:33:52Z
+Created At: 2026-05-24T07:33:52Z
+Completed At: 2026-05-24T07:34:07Z
+The following changes were made by the multi_replace_file_content tool to: d:\soft_kaifa\闆嗘垚骞冲彴\1\electron\eip-class1.js. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -751,26 +751,26 @@
+                                                  }
+                                                  console.log(`[EIP Class 1 Slave] Extracted Tag: ${reqTag}, Instances O->T: ${reqO2TInstance}, T->O: ${reqT2OInstance}`);
+   
+-                                                 // 1. Precise Match by Tag Name
+-                                                 if (reqTag) {
+-                                                     targetConn = this.config.adapterConfig.connections.find(c => 
+-                                                         c && typeof c.connectionPath === 'string' && c.connectionPath.trim().toLowerCase() === reqTag.toLowerCase()
+-                                                     );
+-                                                 }
+-  
+-                                                 // 2. Precise Match by Assembly Instance IDs
+-                                                 if (!targetConn && reqO2TInstance !== null && reqT2OInstance !== null) {
+-                                                     targetConn = this.config.adapterConfig.connections.find(c => 
+-                                                         c.o2tInstance === reqO2TInstance && c.t2oInstance === reqT2OInstance
+-                                                     );
+-                                                 }
+-  
+-                                                 // 3. Precise Match by connectionPath Hex string
+-                                                 if (!targetConn) {
+-                                                     targetConn = this.config.adapterConfig.connections.find(c => 
+-                                                         c && typeof c.conne
+<truncated 2497 bytes>
+        (targetConn.connectionPath && typeof targetConn.connectionPath === 'string' && !/^([0-9A-Fa-f]{2}\s*)+$/.test(targetConn.connectionPath.trim())) || 
++                                                (targetConn.connectionPath && !/^([0-9A-Fa-f]{2}\s*)+$/.test(targetConn.connectionPath.trim())) || 
+                                                 !!reqTag;
+                                             
+                                             if (isTagConnection) {
+-                                                targetConn.connectionType = 'TAG'; // Force TAG connection type in runtime
+                                                 // Preserve UI configured sizes (e.g. 4 bytes) instead of overwriting with Scanner's request size
+                                             } else {
+                                                 // Robust O->T sizing: detect standard size + 4 (Run/Idle), legacy size + 6, or fall back to standard -4.
+@@ -841,8 +841,7 @@
+                                                     t2oDataset: targetConn.t2oDataset,
+                                                     loopbackMappings: targetConn.loopbackMappings,
+                                                     bulkLoopback: targetConn.bulkLoopback,
+-                                                    connectionType: targetConn.connectionType,
+-                                                    connectionPath: targetConn.connectionPath
++                                                    connectionType: targetConn.connectionType
+                                                 });
+                                             }
+                                         }
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+We did our best to apply changes despite some inaccuracies. Double check if the edit applied is what you intended.
+-----------------

@@ -1,0 +1,6 @@
+{
+  "name": ": 工业协议集成平台 V2.7.4（EIP IO）",
+  "description": "专业级工业协议集成平台，支持 OPC UA、EtherNet/IP、Modbus TCP/RTU/ASCII 主从站通讯。提供数据监控、读写测试、报文分析及仿真功能。",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

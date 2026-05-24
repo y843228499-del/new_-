@@ -1,0 +1,170 @@
+Time: 2026-05-24T06:24:51Z
+Created At: 2026-05-24T06:24:51Z
+Completed At: 2026-05-24T06:25:04Z
+The following changes were made by the replace_file_content tool to: d:\soft_kaifa\集成平台\1\electron\eip-class1.js. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -681,7 +681,10 @@
+                                         const timeoutTicks = unconnectedDataItem.readUInt8(cipOffset++);
+                                         
+                                         const o2tConnId = unconnectedDataItem.readUInt32LE(cipOffset); cipOffset += 4;
+-                                        const t2oConnId = unconnectedDataItem.readUInt32LE(cipOffset); cipOffset += 4;
++                                        let t2oConnId = unconnectedDataItem.readUInt32LE(cipOffset); cipOffset += 4;
++                                        if (!t2oConnId) {
++                                            t2oConnId = Math.floor(Math.random() * 0x7FFFFFF0) + 0x10000;
++                                        }
+                                         const connSerial = unconnectedDataItem.readUInt16LE(cipOffset); cipOffset += 2;
+                                         const vendorId = unconnectedDataItem.readUInt16LE(cipOffset); cipOffset += 2;
+                                         const originatorSerial = unconnectedDataItem.readUInt32LE(cipOffset); cipOffset += 4;
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+We did our best to apply changes despite some inaccuracies. Double check if the edit applied is what you intended.
+-----------------
+Time: 2026-05-24T06:25:07Z
+Created At: 2026-05-24T06:25:07Z
+Completed At: 2026-05-24T06:25:07Z
+The following changes were made by the replace_file_content tool to: d:\soft_kaifa\集成平台\1\electron\eip-class1-worker.js. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -469,7 +469,8 @@
+                 }
+                 
+                 // Timeout check using configured multiplier
+-                if (!c.isDropped && c.stats) {
++                const isTag = c.connectionType === 'TAG';
++                if (!isTag && !c.isDropped && c.stats) {
+                     const timeSinceLastRx = currentTime - (c.stats.lastRxTime > 0 ? c.stats.lastRxTime : c.stats.startTime);
+                     const timeoutMs = Math.max((c.rpi || 50) * c.timeoutMultiplier, 2000);
+                     if (timeSinceLastRx > timeoutMs) {
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+-----------------
+Time: 2026-05-24T06:26:57Z
+Created At: 2026-05-24T06:26:57Z
+Completed At: 2026-05-24T06:26:57Z
+The following changes were made by the replace_file_content tool to: C:\Users\84322\.gemini\antigravity\brain\1b83c754-69c2-417c-a241-8fc5d77cf87e\task.md. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -30,6 +30,8 @@
+   - `[x]` I/O 映射 (EipClass1IOMappingView) 对 TAG 连接展示 inputs (O->T) 允许手动写入和批量映射，隐藏只读的 outputs (T->O)
+   - `[x]` 周期性 UDP Worker 引擎 (eip-class1-worker) 根据 `connectionType === 'TAG'` 从从站向主站方向周期广播 O->T (inputs) 准备值数据包，免除标准控制头字节校验
+   - `[x]` 主线程 (eip-class1.js) 适配 Forward Open 解析逻辑，对 TAG 连接免除 -4 字节的 Run/Idle 校验头大小裁剪
++  - `[x]` 修正 T->O Connection ID 动态分配：当主站发来的 Forward Open 携带 `0` 作为 T->O Network Connection ID 时，从站端自动为其随机分发不为 0 的唯一连接 ID 并在 Response 中返回，确保 Worker 周期广播不被跳过
++  - `[x]` 修正单向 TAG 接收超时：在 Worker (`eip-class1-worker.js`) 周期循环中，对 `TAG` 类型连接自动豁免/绕过 inputs (O->T) 单向接收超时限制，防止连接瞬间被置为 `isDropped` 挂起
+   - `[x]` 编译构建最新安装包交付（`dist_electron\Industrial Client Suite Setup 2.6.6.exe`）
+ 
+ 
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+-----------------
+Time: 2026-05-24T06:27:00Z
+Created At: 2026-05-24T06:27:00Z
+Completed At: 2026-05-24T06:27:08Z
+The following changes were made by the replace_file_content tool to: C:\Users\84322\.gemini\antigravity\brain\1b83c754-69c2-417c-a241-8fc5d77cf87e\walkthrough.md. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -102,6 +102,17 @@
+   * 传输数据大小为 `c.o2tSize`（即 Inputs），内容取自 `c.data`（托管 inputs 的准备值和回环数据）。
+   * 调用 `sendImplicit` 传输时，将 `isTag` 作为 `isTagConnection` 参数传入，完美免除了 4 字节 standard 控制头。
+ 
++### 5. 修正与攻克 TAG 周期广播挂起两大物理缺陷 (`eip-class1.js` & `eip-class1-worker.js`) [CRITICAL FIX]
++为了彻底解决“能响应主站发来的请求，但从站不按周期发起 UDP 数据帧给主站”这一通讯异常，我们精确定位并攻克了以下两个底层物理协议设计细节：
++* **T->O Connection ID 动态分发**：
++  * 在标准 EIP 拓扑中，主站（Scanner）发送 Forward Open 请求时，会把 `T->O Network Connection ID` 填充为 `0`，意图交由从站分配。
++  * 我们对此做了高可靠修正：如果收到 `T->O Connection ID` 为 `0` 时，从站在主线程动态随机分配一个唯一的 `t2oConnId`（例如 `Math.floor(Math.random() * 0x7FFFFFF0) + 0x10000`），在 Forward Open Response 中回传给主站。
++  * 这样避免了 Worker 线程由于检测到 `!c.t2oConnId` (即连接 ID 为 0) 而将发送周期跳过的逻辑缺陷。
++* **单向 TAG 接收超时豁免**：
++  * 标签通讯是单向的，从站作为生产者（O->T）周期发数据，主站（Scanner）作为纯消费者不会定期向从站回发隐式 UDP 数据包。
++  * 之前从站检测到没有 incoming 隐式 UDP 时，会在 2 秒内触发 Rx 接收超时，从而将 `c.isDropped` 置为 `true` 并挂起发送。
++  * 我们在 Worker 轮询中进行了精准过滤：对 `connectionType === 'TAG'` 的连接完全绕过/豁免接收超时判定，确保一旦主站 TCP 握手与 Forward Open 成功，UDP 周期广播引擎即持续高频点亮，绝不断联。
++
+ ---
+ 
+ ## 🛠 最新打包交付成果
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+We did our best to apply changes despite some inaccuracies. Double check if the edit applied is what you intended.
+-----------------
+Time: 2026-05-24T06:36:30Z
+Created At: 2026-05-24T06:36:30Z
+Completed At: 2026-05-24T06:36:30Z
+The following changes were made by the replace_file_content tool to: d:\soft_kaifa\集成平台\1\electron\eip-class1.js. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -779,8 +779,7 @@
+                                             const rawT2OSize = isLarge ? (t2oParams & 0xFFFF) : (t2oParams & 0x01FF);
+                                             
+                                             if (targetConn.connectionType === 'TAG') {
+-                                                targetConn.o2tSize = rawO2TSize;
+-                                                targetConn.t2oSize = rawT2OSize;
++                                                // Preserve UI configured sizes (e.g. 4 bytes) instead of overwriting with Scanner's request size
+                                             } else {
+                                                 // Robust O->T sizing: detect standard size + 4 (Run/Idle), legacy size + 6, or fall back to standard -4.
+                                                 if (rawO2TSize === targetConn.o2tSize + 6) {
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+-----------------
+Time: 2026-05-24T06:36:57Z
+Created At: 2026-05-24T06:36:57Z
+Completed At: 2026-05-24T06:36:58Z
+The following changes were made by the multi_replace_file_content tool to: d:\soft_kaifa\集成平台\1\electron\eip-class1.js. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -816,6 +816,8 @@
+                                                     o2tConnId: o2tConnId,
+                                                     t2oConnId: t2oConnId,
+                                                     rpi: targetConn.rpi,
++                                                    o2tSize: targetConn.o2tSize,
++                                                    t2oSize: targetConn.t2oSize,
+                                                     o2tDataset: targetConn.o2tDataset,
+                                                     t2oDataset: targetConn.t2oDataset,
+                                                     loopbackMappings: targetConn.loopbackMappings,
+@@ -1067,6 +1067,8 @@
+                     connIdStr: connIdStr,
+                     o2tConnId: connIds.o2tConnId,
+                     t2oConnId: connIds.t2oConnId,
++                    o2tSize: targetConn.o2tSize,
++                    t2oSize: targetConn.t2oSize,
+                     connectionType: targetConn.connectionType
+                 });
+             } catch (e) {
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+-----------------
+Time: 2026-05-24T06:37:01Z
+Created At: 2026-05-24T06:37:01Z
+Completed At: 2026-05-24T06:37:01Z
+The following changes were made by the replace_file_content tool to: d:\soft_kaifa\集成平台\1\electron\eip-class1-worker.js. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -213,6 +213,8 @@
+             conn.o2tConnId = msg.o2tConnId;
+             conn.t2oConnId = msg.t2oConnId;
+             if (msg.rpi) conn.rpi = msg.rpi;
++            if (msg.o2tSize !== undefined) conn.o2tSize = msg.o2tSize;
++            if (msg.t2oSize !== undefined) conn.t2oSize = msg.t2oSize;
+             if (msg.o2tDataset) conn.o2tDataset = msg.o2tDataset;
+             if (msg.t2oDataset) conn.t2oDataset = msg.t2oDataset;
+             if (msg.loopbackMappings) conn.loopbackMappings = msg.loopbackMappings;
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+-----------------
+Time: 2026-05-24T06:39:05Z
+Created At: 2026-05-24T06:39:05Z
+Completed At: 2026-05-24T06:39:05Z
+The following changes were made by the replace_file_content tool to: C:\Users\84322\.gemini\antigravity\brain\1b83c754-69c2-417c-a241-8fc5d77cf87e\task.md. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -32,6 +32,7 @@
+   - `[x]` 主线程 (eip-class1.js) 适配 Forward Open 解析逻辑，对 TAG 连接免除 -4 字节的 Run/Idle 校验头大小裁剪
+   - `[x]` 修正 T->O Connection ID 动态分配：当主站发来的 Forward Open 携带 `0` 作为 T->O Network Connection ID 时，从站端自动为其随机分发不为 0 的唯一连接 ID 并在 Response 中返回，确保 Worker 周期广播不被跳过
+   - `[x]` 修正单向 TAG 接收超时：在 Worker (`eip-class1-worker.js`) 周期循环中，对 `TAG` 类型连接自动豁免/绕过 inputs (O->T) 单向接收超时限制，防止连接瞬间被置为 `isDropped` 挂起
++  - `[x]` 修正 TAG 发送数据帧长度不一致问题：在 Forward Open 请求解析中，完全移除 `TAG` 类型连接的 size 覆写行为，保留用户在 UI 上配置的精确字节尺寸（如 `4` 字节）；并在 `updateIds` 信令中加入 `o2tSize` 与 `t2oSize` 传递，强制 Worker 以配置的大小为准进行 implicit 发送
+   - `[x]` 编译构建最新安装包交付（`dist_electron\Industrial Client Suite Setup 2.6.6.exe`）
+ 
+ 
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+-----------------
